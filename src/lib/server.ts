@@ -27,16 +27,11 @@ export async function logout() {
 }
 
 export async function register(username: string, password: string) {
-  // TODO: Put this back and fix
-  // const existingUser = await db.user.findUnique({ where: { username } });
-  // if (existingUser) throw new Error('User already exists');
-  const result = await db.one(
-    "INSERT INTO users(id, username, password, email) VALUES (1, 'test', 'abc123', 'test@example.com');"
-  );
-  return result;
-  // return db.user.create({
-  //   data: { username: username, password },
-  // });
+  const existingUser = await db.user.findUnique({ where: { username } });
+  if (existingUser) throw new Error('User already exists');
+  return db.user.create({
+    data: { username: username, password },
+  });
 }
 
 export function getSession() {

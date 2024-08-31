@@ -17,7 +17,7 @@ storage.setItem('users:data', [
 ]);
 storage.setItem('users:counter', 1);
 
-export const dbOld = {
+export const db = {
   user: {
     async create({ data }: { data: { username: string; password: string } }) {
       const [{ value: users }, { value: index }] = await storage.getItems([
