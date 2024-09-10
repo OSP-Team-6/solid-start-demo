@@ -31,7 +31,7 @@ export const loginOrRegister = action(async (formData: FormData) => {
   const loginType = String(formData.get("loginType"));
   let error = validateUsername(username) || validatePassword(password);
   if (error) return new Error(error);
-
+  console.log('In loginOrRegister')
   try {
     const user = await (loginType !== "login"
       ? register(username, password)
