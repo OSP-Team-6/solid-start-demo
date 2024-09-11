@@ -1,5 +1,6 @@
 {
-  "name": "example-basic",
+  "name": "solid-auth-ui",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",
@@ -16,5 +17,10 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "files": [
+    "src/components/login-UI.tsx",
+    "src/components/login-UI.css",
+    "public"
+  ]
 }
