@@ -10,7 +10,7 @@ export const authCallbacks: AuthCallbacks = {
   if (!user || password !== user.password) throw new Error('Invalid login');
   return { ...user, id: user.id.toString() };
   },
-//   register: async (username, password) => {
+//  register: async (username, password) => {
 //     // Your existing register logic using db
 //   },
 //   logout: async () => {
@@ -22,4 +22,4 @@ export const authCallbacks: AuthCallbacks = {
 //   validatePassword: (password) => {
 //     // Your existing validatePassword logic
 //   },
-};
+}; 

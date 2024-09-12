@@ -1,5 +1,5 @@
 import { createContext, useContext, createSignal } from "solid-js";
-//import { AuthCallbacks } from "./authTypes";
+import { AuthCallbacks, User } from "./authTypes";
 import { authCallbacks } from "./authCallbacks";
 
 interface AuthContextType {
