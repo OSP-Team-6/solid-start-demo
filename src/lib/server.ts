@@ -1,5 +1,5 @@
 import { useSession } from 'vinxi/http';
-import { db } from './db-postgres';
+import { db } from './db';
 
 export function validateUsername(username: unknown) {
   if (typeof username !== 'string' || username.length < 3) {
