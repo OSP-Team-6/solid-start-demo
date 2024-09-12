@@ -10,9 +10,14 @@ export const authCallbacks: AuthCallbacks = {
     if (!user || password !== user.password) throw new Error('Invalid login');
     return { ...user, id: user.id.toString() };
   },
-  //   register: async (username, password) => {
-  //     // Your existing register logic using db
-  //   },
+  register: async (username: string, password: string) => {
+    console.log('hit correct register function');
+    const existingUser = await db.user.findUnique({ where: { username } });
+    if (existingUser) throw new Error('User already exists');
+    return db.user.create({
+      data: { username: username, password },
+    });
+  },
   //   logout: async () => {
   //     // Your existing logout logic
   //   },

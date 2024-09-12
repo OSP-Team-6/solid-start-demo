@@ -3,26 +3,26 @@ import { Show } from 'solid-js';
 import { loginOrRegister } from '~/lib';
 
 // TODO: importing this and invoking it causes npm run build to break. why?
-import { authCallbacks } from '~/auth-lib/authCallbacks';
-console.log(authCallbacks);
+//import { authCallbacks } from '~/auth-lib/authCallbacks';
+//console.log(authCallbacks);
 
 export default function Login(props: RouteSectionProps) {
   const loggingIn = useSubmission(loginOrRegister);
 
-  const handleSubmit = async (event: Event) => {
-    console.log('in handleSubmit');
-    event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const result = await loginOrRegister(formData);
-    // Handle the result (e.g., error handling, redirect, etc.)
-    // testing:...
-    return result;
-  };
+  // const handleSubmit = async (event: Event) => {
+  //   console.log('in handleSubmit');
+  //   event.preventDefault();
+  //   const formData = new FormData(event.target as HTMLFormElement);
+  //   const result = await loginOrRegister(formData);
+  //   // Handle the result (e.g., error handling, redirect, etc.)
+  //   // testing:...
+  //   return result;
+  // };
 
   return (
     <main>
       <h1>Login</h1>
-      <form onSubmit={handleSubmit} method="post">
+      <form action={loginOrRegister} method="post">
         <input
           type="hidden"
           name="redirectTo"

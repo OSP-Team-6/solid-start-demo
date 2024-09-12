@@ -27,6 +27,7 @@ export async function logout() {
 }
 
 export async function register(username: string, password: string) {
+  console.log('incorrect register');
   const existingUser = await db.user.findUnique({ where: { username } });
   if (existingUser) throw new Error('User already exists');
   return db.user.create({

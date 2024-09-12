@@ -9,6 +9,7 @@ import {
   validateUsername,
 } from './server';
 import { AuthCallbacks } from '~/auth-lib/authTypes';
+import { authCallbacks } from '~/auth-lib/authCallbacks';
 
 // This file runs on the server. These are basically auth server functions. Could be called authServer.ts.
 
@@ -29,15 +30,21 @@ export const getUser = cache(async () => {
 
 export const loginOrRegister = action(async (formData: FormData) => {
   'use server';
+  return performLoginOrRegister(formData, authCallbacks);
+});
+
+async function performLoginOrRegister(formData: FormData, callbacks: AuthCallbacks) {
   const username = String(formData.get('username'));
   const password = String(formData.get('password'));
   const loginType = String(formData.get('loginType'));
+
   let error = validateUsername(username) || validatePassword(password);
   if (error) return new Error(error);
+
   try {
     const user = await (loginType !== 'login'
-      ? register(username, password)
-      : login(username, password));
+      ? callbacks.register(username, password)
+      : callbacks.login(username, password));
     const session = await getSession();
     await session.update((d) => {
       d.userId = user.id;
@@ -45,11 +52,6 @@ export const loginOrRegister = action(async (formData: FormData) => {
   } catch (err) {
     return err as Error;
   }
-  return redirect('/');
-});
 
-export const logout = action(async () => {
-  'use server';
-  await logoutSession();
-  return redirect('/login');
-});
+  return redirect('/');
+}
