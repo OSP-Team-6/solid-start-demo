@@ -2,9 +2,7 @@ import { action, cache, redirect } from '@solidjs/router';
 import { db } from './db';
 import {
   getSession,
-  login,
   logout as logoutSession,
-  register,
   validatePassword,
   validateUsername,
 } from './server';
@@ -34,6 +32,7 @@ export const loginOrRegister = action(async (formData: FormData) => {
 });
 
 async function performLoginOrRegister(formData: FormData, callbacks: AuthCallbacks) {
+  'use server';
   const username = String(formData.get('username'));
   const password = String(formData.get('password'));
   const loginType = String(formData.get('loginType'));
@@ -55,3 +54,9 @@ async function performLoginOrRegister(formData: FormData, callbacks: AuthCallbac
 
   return redirect('/');
 }
+
+export const logout = action(async () => {
+  "use server";
+  await logoutSession();
+  return redirect("/login");
+});

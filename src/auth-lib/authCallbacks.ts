@@ -6,9 +6,10 @@ export const authCallbacks: AuthCallbacks = {
   //     // Your existing getSession logic
   //   },
   login: async (username: string, password: string) => {
+    console.log('hit correct login function');
     const user = await db.user.findUnique({ where: { username } });
     if (!user || password !== user.password) throw new Error('Invalid login');
-    return { ...user, id: user.id.toString() };
+    return { ...user, id: user.id };
   },
   register: async (username: string, password: string) => {
     console.log('hit correct register function');

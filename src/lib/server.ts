@@ -13,11 +13,11 @@ export function validatePassword(password: unknown) {
   }
 }
 
-export async function login(username: string, password: string) {
-  const user = await db.user.findUnique({ where: { username } });
-  if (!user || password !== user.password) throw new Error('Invalid login');
-  return user;
-}
+// export async function login(username: string, password: string) {
+//   const user = await db.user.findUnique({ where: { username } });
+//   if (!user || password !== user.password) throw new Error('Invalid login');
+//   return user;
+// }
 
 export async function logout() {
   const session = await getSession();
@@ -26,14 +26,14 @@ export async function logout() {
   });
 }
 
-export async function register(username: string, password: string) {
-  console.log('incorrect register');
-  const existingUser = await db.user.findUnique({ where: { username } });
-  if (existingUser) throw new Error('User already exists');
-  return db.user.create({
-    data: { username: username, password },
-  });
-}
+// export async function register(username: string, password: string) {
+//   console.log('incorrect register');
+//   const existingUser = await db.user.findUnique({ where: { username } });
+//   if (existingUser) throw new Error('User already exists');
+//   return db.user.create({
+//     data: { username: username, password },
+//   });
+// }
 
 export function getSession() {
   return useSession({
