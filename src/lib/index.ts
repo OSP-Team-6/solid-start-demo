@@ -1,11 +1,5 @@
 import { action, cache, redirect } from '@solidjs/router';
 import { db } from './db';
-import {
-  getSession,
-  logout as logoutSession,
-  validatePassword,
-  validateUsername,
-} from './server';
 import { AuthCallbacks } from '~/auth-lib/authTypes';
 import { authCallbacks } from '~/auth-lib/authCallbacks';
 
@@ -14,14 +8,16 @@ import { authCallbacks } from '~/auth-lib/authCallbacks';
 export const getUser = cache(async () => {
   'use server';
   try {
-    const session = await getSession();
-    const userId = session.data.userId;
+    const session = await authCallbacks.getSession();
+    //might need to have userID be string
+    const userId = Number(session.data.userId);
+    
     if (userId === undefined) throw new Error('User not found');
     const user = await db.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error('User not found');
     return { id: user.id, username: user.username };
   } catch {
-    await logoutSession();
+    await authCallbacks.logout();
     redirect('/login');
   }
 }, 'user');
@@ -37,16 +33,16 @@ async function performLoginOrRegister(formData: FormData, callbacks: AuthCallbac
   const password = String(formData.get('password'));
   const loginType = String(formData.get('loginType'));
 
-  let error = validateUsername(username) || validatePassword(password);
+  let error = callbacks.validateUsername(username) || callbacks.validatePassword(password);
   if (error) return new Error(error);
 
   try {
     const user = await (loginType !== 'login'
       ? callbacks.register(username, password)
       : callbacks.login(username, password));
-    const session = await getSession();
+    const session = await callbacks.getSession();
     await session.update((d) => {
-      d.userId = user.id;
+      d.userId = user.id.toString();
     });
   } catch (err) {
     return err as Error;
@@ -57,6 +53,6 @@ async function performLoginOrRegister(formData: FormData, callbacks: AuthCallbac
 
 export const logout = action(async () => {
   "use server";
-  await logoutSession();
+  await authCallbacks.logout();
   return redirect("/login");
 });
