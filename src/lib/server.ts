@@ -1,4 +1,6 @@
+import { createAuthCallbacks } from '@solid-auth/solidstart-auth-backend';
 import { useSession } from 'vinxi/http';
-import { db } from './db';
+
+export const authCallbacks = createAuthCallbacks(useSession);
 
 //this had the server fucntions(login,logout etc)
