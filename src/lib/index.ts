@@ -4,6 +4,14 @@ import { AuthCallbacks } from '@solid-auth/solidstart-auth-backend';
 import { authCallbacks } from './server';
 
 // This file runs on the server. These are basically auth server functions. Could be called authServer.ts.
+const userLookupFunction = (username: string) => {
+  'use server';
+  return db.user.findUnique({ where: { username: username } });
+};
+const userCreateFunction = (username: string, password: string) => {
+  'use server';
+  return db.user.create({ data: { username, password } });
+};
 
 export const getUser = cache(async () => {
   'use server';
@@ -43,8 +51,13 @@ async function performLoginOrRegister(
 
   try {
     const user = await (loginType !== 'login'
-      ? callbacks.register(username, password, getUser)
-      : callbacks.login(username, password));
+      ? callbacks.register(
+          username,
+          password,
+          userLookupFunction,
+          userCreateFunction
+        )
+      : callbacks.login(username, password, userLookupFunction));
     const session = await callbacks.getSession();
     await session.update((d) => {
       d.userId = user.id.toString();
