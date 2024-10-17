@@ -3,8 +3,10 @@ import fsLiteDriver from 'unstorage/drivers/fs-lite';
 
 type User = {
   id: number;
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
+  email?: string;
+  provider?: string;
 };
 
 const storage = createStorage({
@@ -19,7 +21,7 @@ storage.setItem('users:counter', 1);
 
 export const db = {
   user: {
-    async create({ data }: { data: { username: string; password: string } }) {
+    async create({ data }: { data: { username?: string; password?: string; email?: string; provider?: string } }) {
       const [{ value: users }, { value: index }] = await storage.getItems([
         'users:data',
         'users:counter',
@@ -32,9 +34,9 @@ export const db = {
       return user;
     },
     async findUnique({
-      where: { username = undefined, id = undefined },
+      where: { username = undefined, id = undefined, email = undefined },
     }: {
-      where: { username?: string; id?: number };
+      where: { username?: string; id?: number; email?: string };
     }) {
       const users = (await storage.getItem('users:data')) as User[];
       if (id !== undefined) {
