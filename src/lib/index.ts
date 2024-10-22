@@ -55,9 +55,10 @@ async function performLoginOrRegister(
           username,
           password,
           userLookupFunction,
-          userCreateFunction
+          userCreateFunction,
+          true
         )
-      : callbacks.login(username, password, userLookupFunction));
+      : callbacks.login(username, password, userLookupFunction, true));
     const session = await callbacks.getSession();
     await session.update((d) => {
       d.userId = user.id.toString();

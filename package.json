@@ -12,6 +12,7 @@
   "dependencies": {
     "@solidjs/router": "^0.14.1",
     "@solidjs/start": "^1.0.6",
+    "bcrypt": "^5.1.1",
     "pg-promise": "^11.9.1",
     "solid-js": "^1.8.18",
     "unstorage": "1.10.2",
