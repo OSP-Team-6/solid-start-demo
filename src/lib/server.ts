@@ -1,4 +1,4 @@
-import { createAuthCallbacks } from '@solid-auth/solidstart-auth-backend';
+import { createAuthCallbacks } from '@solid-auth/server';
 import { useSession } from 'vinxi/http';
 import bcrypt from 'bcrypt';
 

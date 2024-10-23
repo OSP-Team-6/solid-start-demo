@@ -1,6 +1,6 @@
 import { action, cache, redirect } from '@solidjs/router';
 import { db } from './db';
-import { AuthCallbacks } from '@solid-auth/solidstart-auth-backend';
+import { AuthCallbacks } from '@solid-auth/server';
 import { authCallbacks } from './server';
 
 // This file runs on the server. These are basically auth server functions. Could be called authServer.ts.
