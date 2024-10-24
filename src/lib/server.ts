@@ -1,6 +1,19 @@
-import { createAuthCallbacks } from '@solid-auth/solidstart-auth-backend';
+import { createAuthCallbacks } from '@solid-auth/server';
 import { useSession } from 'vinxi/http';
+import bcrypt from 'bcrypt';
 
-export const authCallbacks = createAuthCallbacks(useSession);
+// Example: With no hashing functions declared
+// export const authCallbacks = createAuthCallbacks(useSession);
 
-//this had the server fucntions(login,logout etc)
+// Example: With hashing functions declared
+// Using bcrypt
+const hashingFunctions = {
+  hash: async (password: string) => {
+    return bcrypt.hash(password, 12);
+  },
+  compare: async (password: string, hashedPassword: string) => {
+    return bcrypt.compare(password, hashedPassword);
+  },
+};
+
+export const authCallbacks = createAuthCallbacks(useSession, hashingFunctions);

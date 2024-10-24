@@ -1,6 +1,6 @@
 import { action, cache, redirect } from '@solidjs/router';
 import { db } from './db';
-import { AuthCallbacks } from '@solid-auth/solidstart-auth-backend';
+import { AuthCallbacks } from '@solid-auth/server';
 import { authCallbacks } from './server';
 
 // This file runs on the server. These are basically auth server functions. Could be called authServer.ts.
@@ -55,10 +55,9 @@ async function performLoginOrRegister(
           username,
           password,
           userLookupFunction,
-          userCreateFunction,
-          true
+          userCreateFunction
         )
-      : callbacks.login(username, password, userLookupFunction, true));
+      : callbacks.login(username, password, userLookupFunction));
     const session = await callbacks.getSession();
     await session.update((d) => {
       d.userId = user.id.toString();
