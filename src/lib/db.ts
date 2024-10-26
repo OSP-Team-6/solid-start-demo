@@ -21,7 +21,7 @@ storage.setItem('users:counter', 1);
 
 export const db = {
   user: {
-    async create({ data }: { data: { username?: string; password?: string; email?: string; provider?: string } }) {
+    async create({ data }: { data: { username: string; password?: string; email?: string; provider?: string } }) {
       const [{ value: users }, { value: index }] = await storage.getItems([
         'users:data',
         'users:counter',
@@ -41,6 +41,8 @@ export const db = {
       const users = (await storage.getItem('users:data')) as User[];
       if (id !== undefined) {
         return users.find((user) => user.id === id);
+      } else if (email !== undefined) {
+        return users.find((user) => user.email === email);
       } else {
         return users.find((user) => user.username === username);
       }

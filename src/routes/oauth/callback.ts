@@ -6,40 +6,47 @@ import { db } from '../../lib/db';
 export async function GET({ request }: { request: Request }) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-
+  console.log('code', code);
   if (!code) {
     return redirect('/login');
   }
 
   try {
-    // Exchange code for tokens (ID token and access token)
-    const { id_token } = await getGoogleTokens(code);
-
-    // Decode and verify the ID token (JWT)
-    const googleUser = await getGoogleUser(id_token);
-
-    const username = googleUser.name || googleUser.email || 'Unknown User';
-
-    // Check if user exists in the database, else create one
-    let user = await db.user.findUnique({ where: { email: googleUser.email } });
+    // Exchange code for tokens
+    const { access_token, id_token } = await getGoogleTokens(code);
+    console.log('ID Token:', id_token);
+    console.log('Access Token:', access_token);
     
+    // Use access_token for getting user info
+    const googleUser = await getGoogleUser(access_token);
+    console.log('googleUser', googleUser);
+
+    // Check if user exists by email in the database
+    let user = await db.user.findUnique({ where: { email: googleUser.email } });
+
+    // If user doesn't exist, create new user entry and redirect to username setup
     if (!user) {
-      const username = googleUser.email ? googleUser.email.split('@')[0] : 'defaultUsername';
-      let user = await db.user.create({
+      const defaultUsername = googleUser.email ? googleUser.email.split('@')[0] : 'defaultUsername';
+      user = await db.user.create({
         data: {
-          username: username ?? 'defaultUsername',
-          email: googleUser.email
+          username: defaultUsername,
+          email: googleUser.email ?? 'unknown@example.com', // Fallback for email
+          provider: googleUser.provider ?? 'unknown',        // Fallback for provider
         }
       });
+      return redirect('/username-setup'); // Redirect new users to set up a username
     }
 
-    // Set userId in the session
+    // ** Ensure `username` has a fallback value, e.g., an empty string **
+    if (!user.username) user.username = '';
+
+    // Set userId in the session for existing users
     const session = await authCallbacks.getSession();
     await session.update((d) => {
-      if (!user) throw new Error('User not found');
-      d.userId = user.id.toString();
+      d.userId = user!.id.toString();
     });
 
+    // Redirect existing user to the home page
     return redirect('/');
   } catch (error) {
     console.error('OAuth callback error:', error);

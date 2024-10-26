@@ -22,8 +22,6 @@ export function googleOAuthUrl() {
 console.log('client_id', googleOAuthUrl())
 // Exchange authorization code for tokens
 export async function getGoogleTokens(code: string) {
-  console.log("GOOGLE_CLIENT_ID:", GOOGLE_CLIENT_ID);
-  console.log("GOOGLE_CLIENT_SECRET:", GOOGLE_CLIENT_SECRET);
   const response = await fetch(GOOGLE_TOKEN_URL, {
     method: 'POST',
     headers: {
@@ -39,19 +37,27 @@ export async function getGoogleTokens(code: string) {
   });
 
   if (!response.ok) {
+    const errorData = await response.json();
+    console.error('Token exchange error:', errorData);
     throw new Error(`Failed to fetch Google tokens: ${response.statusText}`);
   }
-
 
   return response.json();
 }
 
 // Get user info from Google using the ID token (JWT)
-export async function getGoogleUser(id_token: string) {
-  const response = await fetch(GOOGLE_USERINFO_URL, {
+export async function getGoogleUser(access_token: string) {
+  const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
     headers: {
-      Authorization: `Bearer ${id_token}`,
+      Authorization: `Bearer ${access_token}`,
     },
   });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('User info error:', errorData);
+    throw new Error(`Failed to fetch user info: ${response.statusText}`);
+  }
+  
   return response.json();
 }

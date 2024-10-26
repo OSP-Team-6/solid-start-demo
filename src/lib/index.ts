@@ -24,46 +24,48 @@ const userCreateFunction = async (
 ): Promise<User> => {
   'use server';
 
+  let user;
+
   if (username && password) {
-    const user = await db.user.create({ data: { username, password } });
-    return {
-      id: user.id,
-      username: user.username || 'defaultUsername',
-      password: user.password || '',  // Ensure password is always a string
-      email: user.email,
-      provider: user.provider || undefined,
-    };
-  }
-
-  if (email && provider) {
+    user = await db.user.create({ data: { username, password } });
+  } else if (email && provider) {
     const derivedUsername = email.split('@')[0]; 
-    const user = await db.user.create({ data: { email, provider, username: derivedUsername } });
-    return {
-      id: user.id,
-      username: user.username || 'defaultUsername',
-      password: '',  // No password in OAuth case, return an empty string
-      email: user.email,
-      provider: user.provider || undefined,
-    };
+    user = await db.user.create({ data: { email, provider, username: derivedUsername } });
+  } else {
+    throw new Error("Either username/password or email/provider must be provided");
   }
+  
+  // Set the user ID in the session directly after creation
+  const session = await authCallbacks.getSession();
+  await session.update((data) => {
+    data.userId = user.id.toString();
+  });
 
-  throw new Error("Either username/password or email/provider must be provided");
+  return {
+    id: user.id,
+    username: user.username || 'defaultUsername',
+    password: '',  // No password in OAuth case, return an empty string
+    email: user.email,
+    provider: user.provider || undefined,
+  };
 };
 
 export const getUser = cache(async () => {
   'use server';
   try {
     const session = await authCallbacks.getSession();
-    //might need to have userID be string
-    const userId = Number(session.data.userId);
-
-    if (userId === undefined) throw new Error('User not found');
-    const user = await db.user.findUnique({ where: { id: userId } });
+    const userId = session.data.userId; // Keep as a string
+  
+    if (!userId) throw new Error('User ID not found in session');
+  
+    const user = await db.user.findUnique({ where: { id: Number(userId) } });
     if (!user) throw new Error('User not found');
-return { id: user.id, username: user.username || 'Unknown User' }; // Provide a fallback
-  } catch {
+    
+    return { id: user.id, username: user.username || 'Unknown User' }; 
+  } catch (error) {
+    console.error(error); // Log the error for debugging
     await authCallbacks.logout();
-    redirect('/login');
+    return redirect('/login');
   }
 }, 'user');
 
@@ -87,14 +89,20 @@ async function performLoginOrRegister(
   if (error) return new Error(error);
 
   try {
-    const user = await (loginType !== 'login'
-      ? callbacks.register(
-          username,
-          password,
-          userLookupFunction,
-          userCreateFunction
-        )
-      : callbacks.login(username, password, userLookupFunction));
+    let user: User;
+    if (loginType !== 'login') {
+      user = await callbacks.register(
+        username,
+        password,
+        userLookupFunction,
+        userCreateFunction
+      );
+      // Log in the user right after registration
+      await callbacks.login(username, password, userLookupFunction);
+    } else {
+      user = await callbacks.login(username, password, userLookupFunction);
+    }
+    
     const session = await callbacks.getSession();
     await session.update((d) => {
       d.userId = user.id.toString();
@@ -110,4 +118,27 @@ export const logout = action(async () => {
   'use server';
   await authCallbacks.logout();
   return redirect('/login');
+});
+
+export const updateUser = action(async (formData: FormData) => {
+  'use server';
+  const username = String(formData.get('username'));
+
+  const session = await authCallbacks.getSession();
+  console.log('Session', session);
+  console.log('Session Data:', session.data);
+  const userId = session.data.userId;
+  
+  if (!userId) {
+    console.error('Session Data if no user ID:', session.data);
+    throw new Error("User ID not found in session");
+  };
+
+  // Update user's username in the database
+  await (db.user as any).update({ // Using 'any' as a type assertion
+    where: { id: userId },
+    data: { username },
+  });
+
+  return redirect('/');
 });
