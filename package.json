@@ -13,7 +13,10 @@
   "dependencies": {
     "@solidjs/router": "^0.14.1",
     "@solidjs/start": "^1.0.6",
+    "aws-sdk": "^2.1691.0",
     "bcrypt": "^5.1.1",
+    "mock-aws-s3": "^4.0.2",
+    "nock": "^13.5.5",
     "pg-promise": "^11.9.1",
     "solid-js": "^1.8.18",
     "unstorage": "1.10.2",
