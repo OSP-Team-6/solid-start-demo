@@ -39,6 +39,11 @@ export default function Login(props: RouteSectionProps) {
           </p>
         </Show>
       </form>
+      <div style="margin-top: 20px;">
+      <button onclick={() => (window.location.href = '/oauth/google')}>
+          Login with Google
+        </button>
+      </div>
     </main>
   );
 }

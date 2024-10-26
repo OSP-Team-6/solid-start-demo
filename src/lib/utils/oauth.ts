@@ -1,7 +1,10 @@
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+import 'dotenv/config';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+// consolelog("client id", )
+const GOOGLE_CLIENT_SECRET = import.meta.env.VITE_GOOGLE_CLIENT_SECRET;
 //not sure if this redirect URL is correct
-const GOOGLE_REDIRECT_URI = 'http://localhost:3000/routes/oauth/callback';
+const GOOGLE_REDIRECT_URI = 'http://localhost:3000/oauth/callback';
 const GOOGLE_OAUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo';
@@ -16,9 +19,11 @@ export function googleOAuthUrl() {
   });
   return `${GOOGLE_OAUTH_URL}?${params.toString()}`;
 }
-
+console.log('client_id', googleOAuthUrl())
 // Exchange authorization code for tokens
 export async function getGoogleTokens(code: string) {
+  console.log("GOOGLE_CLIENT_ID:", GOOGLE_CLIENT_ID);
+  console.log("GOOGLE_CLIENT_SECRET:", GOOGLE_CLIENT_SECRET);
   const response = await fetch(GOOGLE_TOKEN_URL, {
     method: 'POST',
     headers: {

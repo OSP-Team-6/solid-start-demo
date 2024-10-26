@@ -1,16 +1,53 @@
 import { action, cache, redirect } from '@solidjs/router';
 import { db } from './db';
-import { AuthCallbacks } from '@solid-auth/solidstart-auth-backend';
+import { AuthCallbacks, User } from '@solid-auth/solidstart-auth-backend';
 import { authCallbacks } from './server';
 
 // This file runs on the server. These are basically auth server functions. Could be called authServer.ts.
-const userLookupFunction = (username: string) => {
-  'use server';
-  return db.user.findUnique({ where: { username: username } });
+const userLookupFunction: (username: string) => Promise<User | undefined> = async (username) => {
+  'use server'
+  const user = await db.user.findUnique({ where: { username } });
+  return user ? {
+    id: user.id,
+    username: user.username || '', // Ensure username is always a string
+    password: user.password || '', // Ensure password is always a string
+    email: user.email || undefined,
+    provider: user.provider || undefined,
+  } : undefined;
 };
-const userCreateFunction = (username: string, password: string) => {
+
+const userCreateFunction = async (
+  username: string, 
+  password?: string, 
+  email?: string, 
+  provider?: string
+): Promise<User> => {
   'use server';
-  return db.user.create({ data: { username, password } });
+
+  if (username && password) {
+    const user = await db.user.create({ data: { username, password } });
+    return {
+      id: user.id,
+      username: user.username || 'defaultUsername',
+      password: user.password || '',  // Ensure password is always a string
+      email: user.email,
+      provider: user.provider || undefined,
+    };
+  }
+
+  if (email && provider) {
+    const derivedUsername = email.split('@')[0]; 
+    const user = await db.user.create({ data: { email, provider, username: derivedUsername } });
+    return {
+      id: user.id,
+      username: user.username || 'defaultUsername',
+      password: '',  // No password in OAuth case, return an empty string
+      email: user.email,
+      provider: user.provider || undefined,
+    };
+  }
+
+  throw new Error("Either username/password or email/provider must be provided");
 };
 
 export const getUser = cache(async () => {
@@ -23,7 +60,7 @@ export const getUser = cache(async () => {
     if (userId === undefined) throw new Error('User not found');
     const user = await db.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error('User not found');
-    return { id: user.id, username: user.username };
+return { id: user.id, username: user.username || 'Unknown User' }; // Provide a fallback
   } catch {
     await authCallbacks.logout();
     redirect('/login');

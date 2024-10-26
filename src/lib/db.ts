@@ -3,7 +3,7 @@ import fsLiteDriver from 'unstorage/drivers/fs-lite';
 
 type User = {
   id: number;
-  username?: string;
+  username: string;
   password?: string;
   email?: string;
   provider?: string;
@@ -34,7 +34,7 @@ export const db = {
       return user;
     },
     async findUnique({
-      where: { username = undefined, id = undefined, email = undefined },
+      where: { username, id, email },
     }: {
       where: { username?: string; id?: number; email?: string };
     }) {
