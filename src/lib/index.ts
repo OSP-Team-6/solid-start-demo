@@ -125,20 +125,25 @@ export const updateUser = action(async (formData: FormData) => {
   const username = String(formData.get('username'));
 
   const session = await authCallbacks.getSession();
-  console.log('Session', session);
-  console.log('Session Data:', session.data);
-  const userId = session.data.userId;
+  
+  const userId = Number(session.data.userId);
+  
   
   if (!userId) {
     console.error('Session Data if no user ID:', session.data);
     throw new Error("User ID not found in session");
   };
-
+  
   // Update user's username in the database
-  await (db.user as any).update({ // Using 'any' as a type assertion
-    where: { id: userId },
-    data: { username },
-  });
+  try {
+    const result = await (db.user as any).update({
+      where: { id: userId },
+      data: { username },
+    });
 
+  } catch (error) {
+    console.error("Database update failed:", error);
+    throw new Error("Failed to update the database");
+  }
   return redirect('/');
 });

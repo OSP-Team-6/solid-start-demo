@@ -6,7 +6,7 @@ import { db } from '../../lib/db';
 export async function GET({ request }: { request: Request }) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  console.log('code', code);
+  
   if (!code) {
     return redirect('/login');
   }
@@ -14,12 +14,11 @@ export async function GET({ request }: { request: Request }) {
   try {
     // Exchange code for tokens
     const { access_token, id_token } = await getGoogleTokens(code);
-    console.log('ID Token:', id_token);
-    console.log('Access Token:', access_token);
+    
     
     // Use access_token for getting user info
     const googleUser = await getGoogleUser(access_token);
-    console.log('googleUser', googleUser);
+    
 
     // Check if user exists by email in the database
     let user = await db.user.findUnique({ where: { email: googleUser.email } });
@@ -33,6 +32,11 @@ export async function GET({ request }: { request: Request }) {
           email: googleUser.email ?? 'unknown@example.com', // Fallback for email
           provider: googleUser.provider ?? 'unknown',        // Fallback for provider
         }
+      });
+    
+      const session = await authCallbacks.getSession();
+      await session.update((d) => {
+        d.userId = user!.id.toString();
       });
       return redirect('/username-setup'); // Redirect new users to set up a username
     }
