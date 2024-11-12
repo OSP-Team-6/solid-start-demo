@@ -7,7 +7,9 @@ import { LoginForm } from '@solid-auth/ui'
 
 export default function testLogin(){
   return(
-    <LoginForm />
+   <main>
+      <LoginForm />
+   </main> 
   )
 }
 
