@@ -3,7 +3,6 @@ import { Route, Router } from '@solidjs/router';
 import { FileRoutes } from '@solidjs/start/router';
 import { Suspense } from 'solid-js';
 import './app.css';
-import { LoginForm } from '@solid-auth/ui';
 
 export default function App() {
   return (
@@ -17,7 +16,6 @@ export default function App() {
       )}
     >
       <FileRoutes />
-      {/* <Route path="/login" component={LoginForm} /> */}
     </Router>
   );
 }

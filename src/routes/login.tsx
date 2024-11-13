@@ -1,9 +1,13 @@
-import { useSubmission, type RouteSectionProps } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 import { Show, onMount, JSX, Component } from 'solid-js';
 import { loginOrRegister } from '~/lib';
 import { LoginFormLight } from '@solid-auth/ui';
 
 export default function testLogin() {
+  // const navigate = useNavigate();
+
+  // const newUserHandler = () => navigate('/sign-up');
+
   return (
     <main>
       <LoginFormLight />
