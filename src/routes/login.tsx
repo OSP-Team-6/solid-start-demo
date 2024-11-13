@@ -1,16 +1,14 @@
 import { useSubmission, type RouteSectionProps } from '@solidjs/router';
-import { Show, onMount, JSX, Component} from 'solid-js';
+import { Show, onMount, JSX, Component } from 'solid-js';
 import { loginOrRegister } from '~/lib';
-import { LoginForm } from '@solid-auth/ui'
+import { LoginFormLight } from '@solid-auth/ui';
 
-
-
-export default function testLogin(){
-  return(
-   <main>
-      <LoginForm />
-   </main> 
-  )
+export default function testLogin() {
+  return (
+    <main>
+      <LoginFormLight />
+    </main>
+  );
 }
 
 // export default function Login(props: RouteSectionProps) {
