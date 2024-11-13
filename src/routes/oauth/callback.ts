@@ -2,6 +2,7 @@ import { redirect } from '@solidjs/router';
 import { getGoogleTokens, getGoogleUser } from '../../lib/utils/oauth';
 import { authCallbacks } from '../../lib/server';
 import { db } from '../../lib/db';
+import { randomUUID } from 'crypto';
 
 export async function GET({ request }: { request: Request }) {
   const url = new URL(request.url);
@@ -31,6 +32,7 @@ export async function GET({ request }: { request: Request }) {
           username: defaultUsername,
           email: googleUser.email ?? 'unknown@example.com', // Fallback for email
           provider: googleUser.provider ?? 'unknown',        // Fallback for provider
+          password: randomUUID(),
         }
       });
     
